@@ -10,6 +10,7 @@ interface IssuesPanelProps {
   generalTips: string[];
   onIssueHover?: (issue: Issue | null) => void;
   onIssueClick?: (issue: Issue) => void;
+  showHeader?: boolean;
 }
 
 function IssueIcon({ type }: { type: IssueType }) {
@@ -48,6 +49,7 @@ export default function IssuesPanel({
   generalTips,
   onIssueHover,
   onIssueClick,
+  showHeader = true,
 }: IssuesPanelProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -61,27 +63,29 @@ export default function IssuesPanel({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-[#E5E7EB] bg-white">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-[#17270C]">
-            {issues.length > 0 ? (
-              <>
-                Issues Found{" "}
-                <span className="ml-2 px-2 py-0.5 bg-[#DC2626] text-white text-xs rounded-full">
-                  {issues.length}
-                </span>
-              </>
-            ) : (
-              "No Issues Found"
+      {showHeader && (
+        <div className="px-4 py-3 border-b border-[#E5E7EB] bg-white">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-[#17270C]">
+              {issues.length > 0 ? (
+                <>
+                  Issues Found{" "}
+                  <span className="ml-2 px-2 py-0.5 bg-[#DC2626] text-white text-xs rounded-full">
+                    {issues.length}
+                  </span>
+                </>
+              ) : (
+                "No Issues Found"
+              )}
+            </h3>
+            {totalSavings > 0 && (
+              <span className="text-sm font-medium text-[#5A9A6B]">
+                Up to ${totalSavings.toLocaleString()}
+              </span>
             )}
-          </h3>
-          {totalSavings > 0 && (
-            <span className="text-sm font-medium text-[#5A9A6B]">
-              Up to ${totalSavings.toLocaleString()}
-            </span>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Issues list */}
       <div className="flex-1 overflow-y-auto">

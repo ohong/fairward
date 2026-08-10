@@ -6,8 +6,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import UploadDropzone from "@/components/bill-buster/UploadDropzone";
 import BillViewer from "@/components/bill-buster/BillViewer";
-import IssuesPanel from "@/components/bill-buster/IssuesPanel";
-import BillChat from "@/components/bill-buster/BillChat";
+import IssuesChatTabs from "@/components/bill-buster/IssuesChatTabs";
 import SummaryBar from "@/components/bill-buster/SummaryBar";
 import CaseDocumentModal from "@/components/bill-buster/CaseDocumentModal";
 import PaymentModal from "@/components/bill-buster/PaymentModal";
@@ -429,27 +428,16 @@ export default function BillBusterPage() {
                     />
                   </div>
 
-                  {/* Right: Issues + Chat */}
-                  <div className="flex flex-col gap-3 h-full min-h-0">
-                    {/* Issues Panel - compact when issues exist */}
-                    {analysis.issues.length > 0 && (
-                      <div className="flex-shrink-0 max-h-[35%] overflow-hidden bg-white rounded-xl border border-[#E5E7EB]">
-                        <IssuesPanel
-                          issues={analysis.issues}
-                          generalTips={analysis.generalTips}
-                          onIssueHover={handleIssueHover}
-                          onIssueClick={handleIssueClick}
-                        />
-                      </div>
-                    )}
-
-                    {/* Chat - fills remaining space */}
-                    <div className="flex-1 min-h-0">
-                      <BillChat
-                        billAnalysis={analysis}
-                        initialMessage={buildInitialChatMessage(analysis)}
-                      />
-                    </div>
+                  {/* Right: Issues + Chat (tabs) */}
+                  <div className="h-full min-h-0">
+                    <IssuesChatTabs
+                      issues={analysis.issues}
+                      generalTips={analysis.generalTips}
+                      billAnalysis={analysis}
+                      initialMessage={buildInitialChatMessage(analysis)}
+                      onIssueHover={handleIssueHover}
+                      onIssueClick={handleIssueClick}
+                    />
                   </div>
                 </div>
               </div>

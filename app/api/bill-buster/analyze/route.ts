@@ -141,11 +141,29 @@ export async function POST(req: NextRequest) {
       (sum, item) => sum + item.billedAmount,
       0
     );
-    const fairEstimate = lineItemsWithBenchmarks.reduce(
+    const fairEstimateRaw = lineItemsWithBenchmarks.reduce(
       (sum, item) => sum + (item.benchmarkAmount || item.billedAmount),
       0
     );
-    const totalSavings = issues.reduce((sum, issue) => sum + issue.estimatedSavings, 0);
+    const savingsFromIssues = issues.reduce((sum, issue) => sum + issue.estimatedSavings, 0);
+
+    let fairEstimate = Number.isFinite(fairEstimateRaw) ? fairEstimateRaw : totalBilled;
+
+    if (totalBilled > 0 && savingsFromIssues > 0) {
+      fairEstimate = Math.min(
+        fairEstimate,
+        Math.max(0, totalBilled - savingsFromIssues)
+      );
+    }
+
+    const savingsFloor = totalBilled > 0 ? Math.max(1, Math.round(totalBilled * 0.01)) : 0;
+    if (totalBilled > 0 && fairEstimate >= totalBilled) {
+      fairEstimate = Math.max(0, totalBilled - savingsFloor);
+    }
+
+    const savingsFromEstimate = Math.max(0, Math.round(totalBilled - fairEstimate));
+    const maxSavings = Math.max(savingsFromIssues, savingsFromEstimate);
+    const minSavings = maxSavings > 0 ? Math.round(maxSavings * 0.5) : 0;
 
     // Build response
     const analysis: BillAnalysis = {
@@ -157,8 +175,8 @@ export async function POST(req: NextRequest) {
         billed: totalBilled,
         fairEstimate,
         potentialSavings: {
-          min: Math.round(totalSavings * 0.5), // Conservative
-          max: totalSavings,
+          min: minSavings, // Conservative
+          max: maxSavings,
         },
       },
       lineItems: lineItemsWithBenchmarks,

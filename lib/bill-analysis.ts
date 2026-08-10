@@ -3,7 +3,7 @@
  */
 
 import { createFireworks } from "@ai-sdk/fireworks";
-import { generateText } from "ai";
+import { generateObject, generateText } from "ai";
 import { z } from "zod";
 import type {
   BillAnalysis,
@@ -192,18 +192,28 @@ export async function parseBillStructure(rawText: string): Promise<ParsedBill> {
   });
 
   try {
-    const result = await generateText({
+    const result = await generateObject({
       model: fireworks(TEXT_MODEL),
+      schema,
       prompt: `Parse this medical bill text into structured JSON data. Extract all information available.
 
 You MUST respond with ONLY valid JSON (no markdown, no explanation) matching this exact structure:
 {
-  "provider": { "name": string|null, "address": string|null, "billingContact": string|null },
-  "dateOfService": string|null,
-  "accountNumber": string|null,
-  "lineItems": [{ "id": string, "description": string, "code": string|null, "codeConfidence": "high"|"medium"|"low", "quantity": number, "billedAmount": number }],
-  "totalBilled": number,
-  "isItemized": boolean
+  "provider": { "name": null, "address": null, "billingContact": null },
+  "dateOfService": null,
+  "accountNumber": null,
+  "lineItems": [
+    {
+      "id": "item_1",
+      "description": "Example description",
+      "code": null,
+      "codeConfidence": "low",
+      "quantity": 1,
+      "billedAmount": 0
+    }
+  ],
+  "totalBilled": 0,
+  "isItemized": false
 }
 
 For each line item:
@@ -221,8 +231,7 @@ ${rawText}
 Respond with ONLY the JSON object, no other text.`,
     });
 
-    const parsed = JSON.parse(extractJSON(result.text));
-    return schema.parse(parsed) as ParsedBill;
+    return schema.parse(result.object) as ParsedBill;
   } catch (error) {
     console.error("parseBillStructure error:", error);
     throw error;

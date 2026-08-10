@@ -14,6 +14,7 @@ interface Message {
 interface BillChatProps {
   billAnalysis: BillAnalysis;
   initialMessage: string;
+  variant?: "default" | "embedded";
 }
 
 function MarkdownContent({ content }: { content: string }) {
@@ -63,7 +64,11 @@ function MarkdownContent({ content }: { content: string }) {
   );
 }
 
-export default function BillChat({ billAnalysis, initialMessage }: BillChatProps) {
+export default function BillChat({
+  billAnalysis,
+  initialMessage,
+  variant = "default",
+}: BillChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "initial",
@@ -179,7 +184,12 @@ export default function BillChat({ billAnalysis, initialMessage }: BillChatProps
   ];
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+    <div
+      className={cn(
+        "flex flex-col h-full bg-white overflow-hidden",
+        variant === "default" && "rounded-xl border border-[#E5E7EB]"
+      )}
+    >
       {/* Header */}
       <div className="flex-shrink-0 px-4 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB]">
         <div className="flex items-center gap-2">
