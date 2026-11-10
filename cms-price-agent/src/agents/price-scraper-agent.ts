@@ -70,7 +70,8 @@ ${CMS_FILE_PATTERNS.keywords.map(k => `- URLs containing "${k}"`).join('\n')}
 
 File extensions to look for: ${CMS_FILE_PATTERNS.validExtensions.join(', ')}
 
-Use firecrawl_scrape to examine the page content and find download links.
+Use firecrawl_scrape with formats: ["markdown", "links"] to examine the page content and find download links.
+Do not use firecrawl_extract: Extract is retired. Read structured fields directly from the scraped content.
 
 ### Step 4: Extract and Validate File URLs
 For each potential file found:
