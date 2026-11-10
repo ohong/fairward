@@ -17,7 +17,7 @@ Since January 1, 2021, CMS requires hospitals to make their standard charges pub
 
 ## Prerequisites
 
-1. **Node.js 18+**
+1. **Node.js 22+**
 2. **Claude Code CLI** installed globally
 3. **Anthropic API Key**
 4. **Firecrawl API Key**
@@ -57,7 +57,7 @@ The `mcp-config.json` file configures Firecrawl as an MCP server:
   "mcpServers": {
     "firecrawl": {
       "command": "npx",
-      "args": ["-y", "firecrawl-mcp"],
+      "args": ["-y", "firecrawl-mcp@3.39.0"],
       "env": {
         "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
       }
@@ -65,6 +65,19 @@ The `mcp-config.json` file configures Firecrawl as an MCP server:
   }
 }
 ```
+
+### API compatibility check
+
+The MCP server is pinned to `firecrawl-mcp@3.39.0`, which uses Firecrawl API v2
+for search, map, and scrape. Node.js 22+ is required by this server. Its deprecated
+`firecrawl_extract` entry point returns a local error without calling the API.
+Use `firecrawl_scrape` with markdown output and read the fields from that content
+instead of either v1 or v2 Extract, which are retiring with v1.
+
+Run `npm run test:firecrawl` from this directory to exercise the configured MCP
+server over stdio and verify its real HTTP requests against a localhost mock.
+The test uses a dummy API key, not your `.env`, and makes no paid Firecrawl calls.
+The first run downloads the pinned npm package if it is not already cached.
 
 ## Usage
 
@@ -208,7 +221,7 @@ export ANTHROPIC_API_KEY=your-key-here
 
 1. Verify your Firecrawl API key is valid
 2. Check your internet connection
-3. Ensure `npx firecrawl-mcp` can run
+3. Ensure `npx -y firecrawl-mcp@3.39.0` can run
 
 ### "No files found"
 
